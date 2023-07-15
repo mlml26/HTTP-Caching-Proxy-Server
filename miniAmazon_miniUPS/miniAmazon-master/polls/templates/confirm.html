@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="static/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+    <!-- <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script> -->
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <title></title>
+    <style>
+        h2 {
+            text-align: center;
+            margin-top: 40px;
+            font-size: 50px;
+            
+        }
+        #request {
+            margin-top: 30px;
+            margin-left: 240px;
+            width: 60%;
+            text-align: center;
+            padding: auto auto;
+            font-size: 22px;
+            border: 1px solid black;
+            padding-bottom: 40px;
+
+        }
+        input {
+            margin-top: 30px;
+            width: 130px;
+            height: 25px;
+            text-align: center;
+        }
+        select {
+            margin-top: 30px;
+            width: 120px;
+            height: 22px;
+            margin-bottom: 0px;
+            text-align: center;
+        }
+        button {
+            background-color: black;
+            color: white;
+            font-size: 24px;
+            margin-top: 40px;
+            width: 180px;
+            height: 60px;
+        }
+        button:hover {
+            cursor: pointer;
+        }
+        textarea {
+            font-style: normal;
+            width: 200px;
+            height: 60px;
+            margin-top: 20px;
+            vertical-align: middle;
+  
+        }
+
+        #p {
+            width: 230px;
+        }
+
+        #sub {
+            width: 370px;
+            margin-top: 25px;
+            padding-top: -10px;
+            
+        }
+
+        #a, #c {
+            margin-top: 30px;
+            margin-bottom: -30px;
+            padding-bottom: -30px;
+        }
+
+        img {
+            display: inline-block;
+            text-align: center;
+           
+            height: 50%;
+            margin-top: 10px;
+            border: 1px solid #ccc;
+
+
+            
+        }
+
+        h3 {
+            text-align:left;
+            width: 87%;
+            margin-top: 30px;
+            margin-left: 80px;
+            padding-bottom: 5px;
+            border-bottom: 1px solid gray;
+            font-size: 22px;
+            margin-bottom: 0px;
+        }
+
+        #post {
+            margin-top: -45px;
+            float: right;
+            font-size: 20px;
+            height: 40px;
+            margin-right: 73px;
+        }
+
+        ul {
+            padding-top: 0px;
+            margin-top: 0px;
+        }
+        ul>li {
+            display: inline-block;
+         
+            list-style: none;
+            margin-left: 85px;
+            font-size: 22px;
+            margin-top: 10px;
+            margin-bottom: 25px;
+
+        }
+
+        h4 {
+            border-bottom: 1px solid #ccc;
+            width: 87%;
+            margin-left: 78px;
+            margin-bottom: 17px;
+        }
+        
+    </style>
+</head>
+<body>
+    <div id="secret_signup">
+        <div id="app">
+            <h2>Confirm Your Order
+            </h2>
+            <div id="request">
+                <img v-bind:src="img_url"><br>
+                Name: &nbsp;<input id="u"type="text" v-model="name" disabled><br>
+                Desc.: &nbsp;<input id="p" type="text" v-model="description" disabled required><br>
+                Amount: &nbsp;<input id="e" type="number" v-model="amount" required max="100"><br>
+                Your Address: &nbsp;X.&nbsp;<input type="number" v-model="address_x" required > &nbsp;&nbsp;&nbsp; Y.&nbsp;&nbsp;<input type="number" v-model="address_y" required><br>
+                UPS Account Name(Optional): &nbsp;<input id="e" type="test" v-model="ups_account_name"><br>
+
+                <button id = "c" @click="cancel">Cancel</button>
+                <button id = "a" @click="addToCart">Add To Cart</button>
+                <button id="sub" @click="confirm">Checkout Right Now</button>
+            </div>
+            <br><br><br><br>
+            <h3>Comments ({comments.length})</h3>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            &nbsp;&nbsp;<button id="post" @click = "post">Post a Comment</button>
+            <ul v-for = 'comment in comments'>
+                <li><b>{comment.username}</b>: &nbsp; {comment.comment}</li>
+                <h4></h4>
+                
+            </ul>
+          
+            
+        </div>
+        
+        
+    </div>
+    <script>
+        var app = new Vue({
+            el:"#app",
+            delimiters: ['{', '}'],
+            data:{
+                product_id: '',
+                name: '',
+                description: '',
+                amount: '',
+                address_x: '',
+                address_y: '',
+                ups_account_name: '',
+                img_url:'',
+                comments: [],
+
+                
+            },
+            mounted: function() {
+                that = this
+                axios.get("aux_get_buy_info").then(function(response) {
+                        if (response.data.status_code == 1) {
+                            alert("Please log in first!")
+                            location.href = "login.html"
+                        } else if (response.data.status_code == 2) {
+                            alert("Error: please choose a product first.")
+                            location.href = "catalog.html"
+                        } else { 
+                            that.name = response.data[0].fields.name
+                            that.description = response.data[0].fields.description
+                            that.email = response.data[0].fields.email
+                            that.product_id = response.data[0].pk
+                            that.img_url = response.data[0].fields.img_url
+                        }
+                    }).catch(function(err) {
+                        alert('Error');
+                    });
+                axios.get("aux_get_comments").then(function(response) {
+                        if (response.data.status_code == 1) {
+                            alert("Please log in first!")
+                            location.href = "login.html"
+                        } else if (response.data.status_code == 2) {
+                            alert("Error: please choose a product first.")
+                            location.href = "catalog.html"
+                        } else { 
+                            that.comments = []
+                            response.data.sort((a, b) => (b.pk - a.pk))
+                            for (i = 0; i < response.data.length; ++i) {
+                                that.comments.push(response.data[i].fields)
+                            }
+                            
+                        }
+                    }).catch(function(err) {
+                        alert('Error');
+                    });
+            },
+            methods: {
+                cancel: function() {
+                    location.href = 'catalog.html'
+                },
+                post: function() {
+                    comment = prompt("Please type your comment, 100 characters limited.")
+                    if (comment == "") {
+                        alert("Cannot post an empty comment!")
+                        return
+                    }
+                    that = this
+                    axios.get("post/" + that.product_id+"/"+comment).then(function(response) {
+                        if (response.data.status_code == 1) {
+                            alert("Please log in first!")
+                            location.href = "login.html"
+                        } else if (response.data.status_code == 2) {
+                            alert("Error: please choose a product first.")
+                            location.href = "catalog.html"
+                        } else { 
+                            alert("Comment posted.")
+                            location.href = "confirm.html"
+                            
+                        }
+                    }).catch(function(err) {
+                        alert('Error');
+                    });
+                },
+                addToCart: function() {
+                    that = this;
+                    if (that.amount == '') {
+                        alert("Amount cannot be empty!")
+                        return
+                    }
+                    if (that.amount <= 0 || that.amount > 1000) {
+                        alert("Invalid Amount! Should be in the range 1 to 1000!")
+                        return
+                    }
+                    if (that.address_x == '' || that.address_y == '') {
+                        alert("Address cannot be empty!")
+                        return
+                    }
+                    ups = that.ups_account_name == "" ? "DEFAULT_NOT_SET" : that.ups_account_name
+                    axios.get("add/"+that.product_id+"/"+that.amount+"/"+that.address_x+"/"+that.address_y+"/"+ups).then(function(response) {
+                        if (response.data.status_code == 1) {
+                            alert("Please log in first!");
+                            location.href = "login.html"
+                        } else if (response.data.status_code == 2) {
+                            alert("Item does not exist.")
+                            location.href = "catalog.html" 
+                        } else {
+                            alert("Added to Cart!")
+                            location.href = "cart.html"
+                        }
+                    }).catch(function(err) {
+                        alert('Error');
+                    });
+                },
+                
+                confirm: function() {
+                    that = this;
+                    if (that.amount == '') {
+                        alert("Amount cannot be empty!")
+                        return
+                    }
+                    if (that.amount <= 0 || that.amount > 1000) {
+                        alert("Invalid Amount! Should be in the range 1 to 1000!")
+                        return
+                    }
+                    if (that.address_x == '' || that.address_y == '') {
+                        alert("Address cannot be empty!")
+                        return
+                    }
+                    ups = that.ups_account_name == "" ? "DEFAULT_NOT_SET" : that.ups_account_name
+                    axios.get("confirm/"+that.product_id+"/"+that.amount+"/"+that.address_x+"/"+that.address_y+"/"+ups).then(function(response) {
+                        if (response.data.status_code == 1) {
+                            alert("Please log in first!");
+                            location.href = "login.html"
+                        } else if (response.data.status_code == 2) {
+                            alert("Item does not exist.")
+                            location.href = "catalog.html" 
+                        } else {
+                            alert("Order submitted!")
+                            location.href = "orders.html"
+                        }
+                    }).catch(function(err) {
+                        alert('Error');
+                    });
+                }
+            },
+            
+
+        });
+    </script>
+    
+</body>
+</html>

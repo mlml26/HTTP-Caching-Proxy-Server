@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="static/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <title></title>
+    <style>
+        h2 {
+            text-align:left;
+            width: 87%;
+            margin-top: 30px;
+            margin-left: 80px;
+            padding-bottom: 5px;
+            border-bottom: 1px solid gray;
+        }
+        ul {
+            display: inline-block;
+            font-size: 20px;
+            list-style: none;
+            width: 900px;
+            border: 1px solid gray;
+            margin-left: 80px;
+            border-radius: 10px;
+            margin-top: 20px;
+            text-align: left;
+            height: 50px;
+            padding-left: 20px;
+            padding-top: 30px;
+        }
+        li {
+            display: inline;
+        }
+        #edit_ {
+            float: right;
+            margin-right: 20px;
+            margin-top: -12px;
+            font-size: 19px;
+            width: 120px;
+            height: 45px;
+            background-color: black;
+            color: white;   
+        }
+        #edit_:hover, #checkout:hover, #remove:hover {
+            background-color: white;
+            color: black;
+            cursor: pointer;
+        }
+        #orders_body {
+            padding-bottom: 30px;
+        }
+
+        #checkout {
+            float: right;
+            margin-right: 65px;
+            margin-top: 30px;
+            font-size: 19px;
+            width: 300px;
+            height: 55px;
+            background-color: black;
+            color: white;
+        }
+
+        #remove {
+            float: right;
+            margin-right: 25px;
+            margin-top: -12px;
+            font-size: 19px;
+            width: 120px;
+            height: 45px;
+            background-color: black;
+            color: white;
+        }
+
+        #checkbox {
+            float: right;
+            width: 50px;
+            height: 50px;
+            margin-top: 33px;
+            margin-right: 80px;
+            margin-left: 15px;
+        }
+
+        img {
+            width: 47px;
+            height: 47px;
+            margin-top: -12px;
+            margin-right: 25px;
+            float: left;
+        }
+
+        #pickall {
+            float: right;
+            width: 30px;
+            height: 30px;
+            margin-top: -3px;
+            margin-right: 20px;
+            margin-left: 0px;
+            padding-bottom: 10px;
+            border: 1px solid #ccc;
+        }
+
+      
+
+
+
+      
+    </style>
+</head>
+<body>
+    <div id="orders_body">
+    <h2>Items in Cart: &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        Pick All&nbsp;&nbsp;<input id="pickall" @click="pickall" type="checkbox"></h2>
+    <div v-for='item in order_list' id = "items">
+    <ul > 
+        <li>Item: {item.name},&nbsp;&nbsp;</li> 
+        <li>Amount: {item.amount},&nbsp;&nbsp;</li>
+        <li>Address: X.{item.address_x} &nbsp; Y.{item.address_y}&nbsp;&nbsp;&nbsp;</li>
+        <li v-if="item.ups_account_name != ''">UPS: {item.ups_account_name}</li>
+        <li><img v-bind:src=item.img_url> </li>
+        <button id = "remove" @click="remove(item.order_id)">Remove</button>
+        <button id = "edit_" @click="edit(item.order_id)">Edit</button>
+        
+        <!-- <button id="edit_" @click="view(item.id, false)">View</button> -->
+    </ul>
+    <input id="checkbox" class="checkbox" @click=pick(item.order_id) type="checkbox">
+</div>
+    <br>
+    <h2></h2>
+    <button id = "checkout" @click="checkout">Checkout</button>
+    <br>
+    
+    </div>
+    <script>
+        var app = new Vue({
+            el:"#orders_body",
+            delimiters: ['{', '}'],
+            data:{
+                order_list: [],
+                pick_list: [],
+                pickedall: false,
+            
+            },
+            mounted: function() {
+                that = this;
+                axios.get("/cart").then(function(response) {
+                    console.log(response.data)
+                    if (response.data.status_code == 1) {
+                        alert("Please log in first!")
+                    } else {
+                        that.order_list = []
+                        that.pick_list = []
+                        for (i = 0; i < response.data.length; ++i) {
+                            response.data[i].fields["order_id"] = response.data[i].pk
+                            that.order_list.push(response.data[i].fields)
+                        }
+                        that.order_list.sort((a, b) => (parseInt(b["order_id"]) - parseInt(a["order_id"])))
+                        console.log(that.order_list)
+                    }
+                }).catch(function(err) {
+                    alert('Error');
+                });
+            },
+            methods: {
+                pickall: function() {
+                    if (this.pickedall == false) {
+                        this.pick_list = []
+                        for (i = 0; i < this.order_list.length; ++i)
+                            this.pick_list.push(this.order_list[i]["order_id"])
+                        checkboxes = document.getElementsByClassName("checkbox")
+                        for (i = 0; i < checkboxes.length; ++i)
+                            checkboxes[i].checked = true
+                        this.pickedall = true;
+                    } else {
+                        this.pick_list = []
+                        checkboxes = document.getElementsByClassName("checkbox")
+                        for (i = 0; i < checkboxes.length; ++i)
+                            checkboxes[i].checked = false
+                        this.pickedall = false
+                        
+                    }
+                },
+                pick: function(order_id) {
+                    if (this.pick_list.includes(order_id) == false) {
+                        this.pick_list.push(order_id)
+                    } else {
+                        this.pick_list = this.pick_list.filter(function(value, index, arr) { return value != order_id })
+                    }
+                },
+                remove: function(order_id) {
+                    that = this;
+                    axios.get("/remove_from_cart/"+order_id).then(function(response) {
+                    if (response.data.status_code == 1) {
+                        alert("Please log in first!")
+                        location.href = "login.html"
+                    } else if (response.data.status_code == 2) {
+                        alert("Error: you do not have this item in your cart!")
+                        return
+                    } else {
+                        alert("Removed!")
+                        location.href = "cart.html"
+                    }
+                    }).catch(function(err) {
+                        alert('Error');
+                    });
+                },
+                edit: function(order_id) {
+                    that = this;
+                    axios.get("/edit/"+order_id).then(function(response) {
+                    if (response.data.status_code == 1) {
+                        alert("Please log in first!")
+                        location.href = "login.html"
+                    } else if (response.data.status_code == 2) {
+                        alert("Error: you do not own this cart order!")
+                        return
+                    } else {
+                        location.href = "edit_order.html"
+                    }
+                    }).catch(function(err) {
+                        alert('Error');
+                    });
+                },
+                checkout: function() {
+                    that = this;
+                    if (that.pick_list.length == 0) {
+                        alert("Please choose at lease one item to checkout!")
+                        return
+                    }
+                    orders = that.pick_list.join(',')
+                    axios.get("/checkout/"+orders).then(function(response) {
+                    if (response.data.status_code == 1) {
+                        alert("Please log in first!")
+                        location.href = "login.html"
+                    } else if (response.data.status_code == 2) {
+                        alert("Error: please only pick items from your cart!")
+                        return
+                    } else {
+                        alert("Order(s) submitted!")
+                        location.href = "cart.html"
+                    }
+                    }).catch(function(err) {
+                        alert('Error');
+                    });
+                },
+                view: function(oid, is_confirmed) {
+                    that = this;
+                    axios.get("view/"+oid).then(function(response) {
+                        if (response.data.status_code == 1) {
+                            alert("Please log in first!")
+                        } else {
+                            if (!is_confirmed) location.href = "/open_order_details.html"
+                            else location.href = "/confirmed_order_details.html"
+                        }
+                    }).catch(function(err) {
+                        alert('Error');
+                    });
+                }
+            },
+            
+
+        });
+    </script>
+</body>
+</html>

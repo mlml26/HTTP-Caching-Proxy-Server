@@ -1,0 +1,276 @@
+
+* {
+    margin: 0;
+    padding: 0;
+    font-family: "Times New Roman", Times, serif;
+}
+button {
+    font-family: Arial, Helvetica, sans-serif;
+}
+input {
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+button:hover {
+    background-color: white;
+    color: black;
+    cursor: pointer;
+}
+
+
+
+#side_bar {
+    float: left;
+    background-color: #565;
+    color: white;
+    font-style: normal;
+    font-weight: 550;
+    font-size: 20px;
+    height: 100%;
+    width: 200px;
+    
+
+}
+
+#main_content {
+    padding-left: 7px;
+    width: 80%;
+    margin-left: 20;
+    height: 100%;
+    float: left;
+}
+iframe {
+    border: none;
+    width: 100%;
+    height: 100%;
+    background-color: white;
+}
+#side_bar>li {
+    line-height: 35px;
+    padding-top: 20px;
+    text-align: center;
+    height: 60px;
+    list-style: none;
+    border-bottom: 0.5px solid white;
+}
+#side_bar_name {
+    background-color: #444;
+
+}
+#side_bar_start:hover, #side_bar_driver_info:hover, #side_bar_account:hover, #side_bar_orders:hover, #side_bar_drive_orders:hover {
+    background-color: #fff;
+    color: black;
+    cursor: pointer;
+}
+#secret_login, #secret_signup, #orders_body {
+    width: 100%;
+    height: 100%;
+    background-color: white;
+    float: left;
+}
+
+#orders_body > li {
+    list-style: none;
+    width: 75%;
+    margin-top: 35px;
+    height: 40px;
+    margin-left: 150px;
+    border: 2px solid gray;
+    border-radius: 10px;
+}
+
+.login_as {
+    display: block;
+    margin-top: 40px;
+    margin-left: 200px;
+    width: 60%;
+    height: 150px;
+    font-style: normal;
+    font-weight: 700;
+    font-size: 30px;
+    cursor: pointer;
+    border-bottom: 1px solid gray;
+
+}
+.login_as:hover {
+    color: #999;
+}
+#mini_arrow {
+    width: 100px;
+    height: 200px;
+    margin-top: 20px;
+    margin-left: -10px;
+    background-size: 100px;
+    background-repeat: no-repeat;
+    background-image: url("mini_arrow.jpg");
+}
+#signup_box {
+    position: relative;
+    float: left;
+    background-color: white;
+    margin-top: 50px;
+    margin-left: 28%;
+    height: 300px;
+    width: 40%;
+}
+
+#signup_box>li {
+    padding-top: 20px;
+    padding-bottom: 15px;
+    list-style: none;
+    text-align: center;
+    font-size: 22px;
+}
+
+#signup_box>li>input {
+    display: inline-block;
+    border-width: 0px;
+    border-bottom: 1px solid #ddd; 
+    height: 25px;
+    padding: none;
+    margin: none;
+    font-size: 20px;
+    width: 220px;
+}
+
+#signup_box>li>input:focus {
+    outline: none;
+}
+#index_body_main {
+    width: 100%;
+    height: 100%;
+    background-image: url("shopping.jpeg");   
+    border-image-repeat: none;
+    float: right;   
+    position: absolute;
+}
+
+#signup_body_main, #login_body_main {
+    width: 100%;
+    height: 100%;
+    background-color: #fff;
+    float: right;   
+    position: absolute;   
+}
+
+#index_body_banner {
+    background-color: black;
+    height: 60px;
+    border-right: 70px solid black;
+}
+
+#index_body_banner>span {
+    margin-left: 60px;
+    margin-top: 22px;
+    color: white;
+    background-color: black;
+    float: left;
+    font-style: italic;
+}
+
+#index_body_banner_logo {
+    cursor: pointer;
+    text-align: left;
+    font-size: 23px;
+    font-weight: 700;
+    color: white;
+    border-top: 17px solid #000;
+    border-left: 60px solid #000;
+   
+    float: left;
+}
+
+#signup_box_logo {
+    line-height: 94px;
+    text-align: center;
+    font-size: 23px;
+    font-weight: 700;
+    color: white;
+    background-color: black;
+    position: relative;
+    float: right;
+    margin-top: 120px;
+    margin-right: 48%;
+    width: 110px;
+    height: 100px;
+    box-shadow: 5px 5px 5px grey;
+}
+
+#signup_logo {
+    cursor: pointer;
+    line-height: 64px;
+    text-align: center;
+    font-size: 23px;
+    font-weight: 700;
+    color: white;
+    background-color: black;
+    position: relative;
+    float: right;
+    margin-top: -80px;
+    margin-right: 41%;
+    width: 320px;
+    height: 60px;
+}
+#login_logo {
+    cursor: pointer;
+    line-height: 64px;
+    text-align: center;
+    font-size: 23px;
+    font-weight: 700;
+    color: white;
+    background-color: black;
+    position: relative;
+    float: right;
+    margin-top: -140px;
+    margin-right: 41%;
+    width: 320px;
+    height: 60px;
+}
+#index_body_banner_login>button:hover {
+    background-color: black;
+    color: white;
+    cursor: pointer;
+}
+#index_body_banner_login > button {
+    float: right;
+    list-style: none;
+    background-color: #fff;
+    /* display: inline-block; */
+    color: black;
+    font-style: initial;
+    font-size: 18px;
+    font-weight: 600;
+    margin-top: 14px;
+    margin-right: 50px;
+    border-radius: 10px;
+    padding: 5px 11px;
+}
+
+#index_body_main_news {
+    position: relative;
+    margin-top: 150px;
+    margin-left: 200px;
+    margin-bottom: 300px;
+    background-color:white;
+    height: 320px;
+    width: 600px;
+    border-radius: 20px;
+}
+
+#index_body_main_news>span {
+    display: block;
+    font-style:  italic;
+    padding-left: 20px;
+    font-weight: 800;
+    font-family: serif;
+    font-size: 40px;
+    padding-top: 30px;
+    margin-top: 20px;
+}
+
+
+
+
+
+
+

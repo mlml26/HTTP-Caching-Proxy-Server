@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="static/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+    <!-- <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script> -->
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <title></title>
+    <style>
+        h2 {
+            text-align: center;
+            margin-top: 40px;
+            font-size: 50px;
+            
+        }
+        #request {
+            margin-top: 30px;
+            margin-left: 240px;
+            width: 60%;
+            text-align: center;
+            padding: auto auto;
+            font-size: 22px;
+            border: 1px solid black;
+            padding-bottom: 40px;
+
+        }
+        input {
+            margin-top: 30px;
+            width: 180px;
+            height: 25px;
+        }
+        select {
+            margin-top: 30px;
+            width: 120px;
+            height: 22px;
+            margin-bottom: 0px;
+            text-align: center;
+        }
+        button {
+            background-color: black;
+            color: white;
+            font-size: 24px;
+            margin-top: 40px;
+         
+            width: 220px;
+            height: 80px;
+        }
+        
+        textarea {
+            font-style: normal;
+            width: 200px;
+            height: 60px;
+            margin-top: 20px;
+            vertical-align: middle;
+  
+        }
+        #sub {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div id="secret_signup">
+        <div id="app">
+            <h2>Your Driver Information
+            </h2>
+            <div id="request">
+                Real Name: &nbsp;<input id="r"type="text" v-model="real_name" required maxlength="50"><br>
+                Licence Plate Number: &nbsp;<input id="l" type="text" v-model="licence_number" required><br>
+                Max Capacity: &nbsp;<input id="c" type="number" v-model="car_capacity" required max="500"><br>
+            
+                Please specify you vehicle type. &nbsp;<select id="t"v-model="car_type" required>
+                    <option selected value="Sedan">Sedan</option>
+                    <option value="SUV">SUV</option>
+                    <option value="Sports Car">Sports Car</option>
+                    <option value="Convertible">Convertible</option>
+                    <option value="Truck">Truck</option>
+                    <option value="Minivan">Minivan</option>
+                </select><br>
+                Special Info: &nbsp;<textarea id="si" v-model="special_info"></textarea><br>
+                <button @click="edit">Edit</button>
+                <button id="sub" @click="submit">Submit</button>
+            </div>
+          
+            
+        </div>
+        
+        
+    </div>
+    <script>
+        var app = new Vue({
+            el:"#app",
+            data:{
+                real_name: '',
+                licence_number: '',
+                car_capacity: 0,
+                car_type: 'Sedan',
+                special_info: '',
+                num_of_orders: 0,
+            },
+            mounted: function() {
+                that = this
+                that = this
+                axios.get("aux_get_driver_info").then(function(response) {
+                        if (response.data.status_code == 1) {
+                            alert("Please log in first!")
+                            location.href = "login.html"
+                        } else if (response.data.status_code == 2) {
+                            alert("You are not a driver yet, please register first!")
+                            location.href = "driver_register.html"
+                        } else { 
+                            that.real_name = response.data[0].fields.real_name
+                            that.licence_number = response.data[0].fields.licence_number
+                            that.car_capacity = response.data[0].fields.car_capacity
+                            that.car_type = response.data[0].fields.car_type
+                            that.special_info = response.data[0].fields.special_info
+                            that.num_of_orders = response.data[0].fields.number_of_incomplete_orders
+                            document.getElementById("t").disabled = true
+                            document.getElementById("r").disabled = true
+                            document.getElementById("c").disabled = true
+                            document.getElementById("l").disabled = true
+                            document.getElementById("si").disabled = true
+                            
+                        }
+                    }).catch(function(err) {
+                        alert('Error');
+                    });
+            },
+            methods: {
+                edit: function() {
+                    if (this.num_of_orders != 0) {
+                        alert("You cannot edit you driver info with incomplete drive orders!")
+                        location.href = "drive_orders.html"
+                        return
+                    }
+                    document.getElementById("t").disabled = false
+                    document.getElementById("r").disabled = false
+                    document.getElementById("c").disabled = false
+                    document.getElementById("l").disabled = false
+                    document.getElementById("si").disabled = false
+                    document.getElementById("sub").style.display = "inline"
+                },
+                submit: function() {
+                    that = this;
+                    if (that.real_name == '') {
+                        alert("Real name cannot be empty!")
+                        return
+                    }
+                    if (that.licence_number == '') {
+                        alert("Licence number cannot be empty!")
+                        return
+                    }
+                    if (that.car_capacity <= 0 || that.car_capacity > 500) {
+                        alert("Please enter a valid vehicle capacity!")
+                        return
+                    }
+                    axios.get("change_driver_info/"+that.real_name+"/"+that.licence_number+"/"+that.car_capacity+"/"+that.car_type+"/"+that.special_info).then(function(response) {
+                        if (response.data.status_code == 1) {
+                            alert("Please log in first!");
+                            location.href = "login.html"
+                        } else if (response.data.status_code == 2){
+                            alert("You are not a driver yet, please register first!")
+                            location.href = "driver_register.html"
+                        } else {
+                            alert("Information submitted!")
+                            document.getElementById("sub").style.display = "none"
+                            document.getElementById("t").disabled = true
+                            document.getElementById("r").disabled = true
+                            document.getElementById("c").disabled = true
+                            document.getElementById("l").disabled = true
+                            document.getElementById("si").disabled = true
+                            
+                        }
+                    }).catch(function(err) {
+                        alert('Error');
+                    });
+                }
+            },
+            
+
+        });
+    </script>
+    
+</body>
+</html>

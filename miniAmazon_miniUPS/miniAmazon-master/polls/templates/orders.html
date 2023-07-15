@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="static/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <title></title>
+    <style>
+        h2 {
+            text-align:left;
+            width: 87%;
+            margin-top: 30px;
+            margin-left: 80px;
+            padding-bottom: 5px;
+            border-bottom: 1px solid gray;
+        }
+        ul {
+            font-size: 20px;
+            list-style: none;
+            width: 900px;
+            border: 1px solid gray;
+            margin-left: 120px;
+            border-radius: 10px;
+            margin-top: 20px;
+            text-align: left;
+            height: 50px;
+            padding-left: 20px;
+            padding-top: 30px;
+        }
+        li {
+            display: inline;
+        }
+        #edit_ {
+            float: right;
+            margin-right: 25px;
+            margin-top: -12px;
+            font-size: 19px;
+            width: 120px;
+            height: 45px;
+            background-color: black;
+            color: white;   
+        }
+        #edit_:hover {
+            background-color: white;
+            color: black;
+            cursor: pointer;
+        }
+        #orders_body {
+            padding-bottom: 30px;
+        }
+
+        img {
+            width: 47px;
+            height: 47px;
+            margin-top: -12px;
+            margin-right: 25px;
+            float: left;
+            border: 1px solid #ccc;
+        }
+    </style>
+</head>
+<body>
+    <div id="orders_body">
+    <h2>Ongoing orders:</h2>
+    <ul v-for='item in order_list'>
+        <li>Tracking No: {item.shipid},&nbsp;&nbsp;</li> 
+        <li>Item: {item.name},&nbsp;&nbsp;</li> 
+        <li>Amount: {item.amount},&nbsp;&nbsp;</li>
+        <li>Address: X.{item.address_x} &nbsp; Y.{item.address_y},&nbsp;&nbsp;</li>
+        <li v-if="item.ups_account_name != ''"> UPS: {item.ups_account_name}&nbsp;&nbsp;</li>
+        <li>Status:<b style="color:green"> {item.status}</b></li>
+        <img v-bind:src=item.img_url> 
+        <!-- <button id="edit_" @click="view(item.id, false)">View</button> -->
+    </ul>
+    <div id="orders_body">
+        <h2>Delivered orders:</h2>
+        <ul v-for='item in delivered_order_list'>
+            <li>Tr: {item.shipid},&nbsp;&nbsp;</li> 
+            <li>Item: {item.name},&nbsp;&nbsp;</li> 
+            <li>Amt: {item.amount},&nbsp;&nbsp;</li>
+            <li>Address: ({item.address_x}, {item.address_y}),&nbsp;&nbsp;</li>
+            <li v-if="item.ups_account_name != ''"> UPS: {item.ups_account_name}&nbsp;&nbsp;</li>
+            <li>Status:<b style="color:green"> {item.status}</b></li>
+            <img v-bind:src=item.img_url> 
+            <button v-if="item.rated == false" id="edit_" @click="rate(item.order_id)">Rate</button>
+        </ul>
+    <br>
+    
+    </div>
+    <script>
+        var app = new Vue({
+            el:"#orders_body",
+            delimiters: ['{', '}'],
+            data:{
+                order_list: [],
+                delivered_order_list:[],
+            },
+            mounted: function() {
+                that = this;
+                axios.get("/orders").then(function(response) {
+                    console.log(response.data)
+                    if (response.data.status_code == 1) {
+                        alert("Please log in first!")
+                    } else {
+                        that.order_list = []
+                        for (i = 0; i < response.data.length; ++i) {
+                            response.data[i].fields["order_id"] = response.data[i].pk
+                            if (response.data[i].fields["status"] == "delivered")
+                                that.delivered_order_list.push(response.data[i].fields)
+                            else
+                                that.order_list.push(response.data[i].fields)
+                        }
+                        that.order_list.sort((a, b) => (parseInt(b["order_id"]) - parseInt(a["order_id"])))
+                        console.log(that.order_list)
+                    }
+                }).catch(function(err) {
+                    alert('Error');
+                });
+            },
+            methods: {
+                rate: function(order_id) {
+                    x = prompt("Please rate this item from 1 ~ 5.")
+                   
+                    if (x == null || x == "") {
+                            alert("Invalid input")
+                            return 
+                    }
+                   
+                    x = parseInt(x)
+                    
+                    if (x < 1 || x > 5) {
+                        alert("Invalid input")
+                        return 
+                    }
+                    that = this
+                    axios.get("rate/" + order_id+"/"+x).then(function(response) {
+                        if (response.data.status_code == 1) {
+                            alert("Please log in first!")
+                            location.href = "login.html"
+                        } else if (response.data.status_code == 2) {
+                            alert("Error: please choose a valid delivered order first.")
+                            location.href = "orders.html"
+                        } else { 
+                            alert("Rated.")
+                            location.href = "orders.html"
+                            
+                        }
+                    }).catch(function(err) {
+                        alert('Error');
+                    });
+                },
+                view: function(oid, is_confirmed) {
+                    that = this;
+                    axios.get("view/"+oid).then(function(response) {
+                        if (response.data.status_code == 1) {
+                            alert("Please log in first!")
+                        } else {
+                            if (!is_confirmed) location.href = "/open_order_details.html"
+                            else location.href = "/confirmed_order_details.html"
+                        }
+                    }).catch(function(err) {
+                        alert('Error');
+                    });
+                }
+            },
+            
+
+        });
+    </script>
+</body>
+</html>

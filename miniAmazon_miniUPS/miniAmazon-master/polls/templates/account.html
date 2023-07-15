@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="static/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+    <!-- <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script> -->
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <title></title>
+    <style>
+        h2 {
+            text-align: center;
+            margin-top: 40px;
+            font-size: 50px;
+            
+        }
+        #request {
+            margin-top: 30px;
+            margin-left: 240px;
+            width: 60%;
+            text-align: center;
+            padding: auto auto;
+            font-size: 22px;
+            border: 1px solid black;
+            padding-bottom: 40px;
+
+        }
+        input {
+            margin-top: 30px;
+            width: 180px;
+            height: 25px;
+        }
+        select {
+            margin-top: 30px;
+            width: 120px;
+            height: 22px;
+            margin-bottom: 0px;
+            text-align: center;
+        }
+        button {
+            background-color: black;
+            color: white;
+            font-size: 24px;
+            margin-top: 40px;
+         
+            width: 220px;
+            height: 80px;
+        }
+        
+        textarea {
+            font-style: normal;
+            width: 200px;
+            height: 60px;
+            margin-top: 20px;
+            vertical-align: middle;
+  
+        }
+        #sub {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div id="secret_signup">
+        <div id="app">
+            <h2>Your Account Information
+            </h2>
+            <div id="request">
+                Username: &nbsp;<input id="u"type="text" v-model="username" required maxlength="50" disabled><br>
+                Password: &nbsp;<input id="p" type="password" v-model="password" disabled required><br>
+                E-mail: &nbsp;<input id="e" type="text" v-model="email" disabled required max="500"><br>
+            
+
+                <button id="EDIT" @click="edit">Edit</button>
+                <button id="sub" @click="submit">Submit</button>
+            </div>
+          
+            
+        </div>
+        
+        
+    </div>
+    <script>
+        var app = new Vue({
+            el:"#app",
+            data:{
+                username:'',
+                password: '',
+                email: '',
+                
+            },
+            mounted: function() {
+                that = this
+                that = this
+                axios.get("aux_get_user_info").then(function(response) {
+                        if (response.data.status_code == 1) {
+                            alert("Please log in first!")
+                            location.href = "login.html"
+                        } else { 
+                            console.log(response.data[0])
+                            that.username = response.data[0].fields.username
+                            that.password = response.data[0].fields.password
+                            that.email = response.data[0].fields.email
+                            
+                        }
+                    }).catch(function(err) {
+                        alert('Error');
+                    });
+            },
+            methods: {
+                edit: function() {
+                    // unsafe
+                    // unsafe
+                    document.getElementById("p").disabled = false
+                    document.getElementById("e").disabled = false
+                    document.getElementById("sub").style.display = "inline"
+		             document.getElementById("EDIT").style.display = "none"
+                },
+                submit: function() {
+                    that = this;
+                    if (that.password == '') {
+                        alert("Password cannot be empty!")
+                        return
+                    }
+                    if (that.email == '') {
+                        alert("E-mail cannot be empty!")
+                        return
+                    }
+                    if (that.email.match("[a-zA-Z0-9]+@[a-zA-Z0-9]+(.[a-zA-Z0-9]+)+") == null) {
+                        alert("Invalid Email address!")
+                        return
+                    }
+                    axios.get("change_user_info/"+that.password+"/"+that.email).then(function(response) {
+                        if (response.data.status_code == 1) {
+                            alert("Please log in first!");
+                            location.href = "login.html"
+                        } else {
+                            alert("Information submitted!")
+                            document.getElementById("sub").style.display = "none"
+                            document.getElementById("p").disabled = true
+                            document.getElementById("e").disabled = true
+                            document.getElementById("EDIT").style.display = "inline"
+                            
+                        }
+                    }).catch(function(err) {
+                        alert('Error');
+                    });
+                }
+            },
+            
+
+        });
+    </script>
+    
+</body>
+</html>

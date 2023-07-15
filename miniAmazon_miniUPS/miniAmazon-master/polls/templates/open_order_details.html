@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="static/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+    <!-- <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script> -->
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <title></title>
+    <style>
+        h2 {
+            text-align: center;
+            margin-top: 40px;
+            font-size: 50px;
+            
+        }
+        #request {
+            padding-top: 20px;
+            margin-top: 50px;
+            line-height: 40px;
+            margin-left: 240px;
+            width: 60%;
+            text-align: center;
+            padding: auto auto;
+            font-size: 25px;
+            border: 1px solid black;
+            padding-bottom: 40px;
+
+        }
+        input {
+            margin-top: 30px;
+            width: 220px;
+            height: 25px;
+        }
+        select {
+            margin-top: 30px;
+            width: 110px;
+            height: 22px;
+            margin-bottom: 0px;
+            text-align: center;
+        }
+        button {
+            background-color: black;
+            color: white;
+            font-size: 20px;
+            margin-top: 40px;
+         
+            width: 190px;
+            height: 70px;
+            margin-left: 30px;
+            margin-right: 30px;
+        }
+        
+        textarea {
+            font-style: normal;
+            width: 200px;
+            height: 60px;
+            margin-top: 20px;
+            vertical-align: middle;
+  
+        }
+        li {
+            list-style: None;
+        }
+
+        #num {
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div id="secret_signup">
+        <div id="app">
+            <h2>Ride Details</h2>
+            <div id="request">
+                <li>Order No: #{order_id}</li> 
+                <li>Dest.: {destination}</li> 
+                <li>Arr. Time: {arrival_time}</li>
+                <li>Order Status: {status}</b></li>
+                <li>Is Exclusive: {is_exclusive}</li>
+                <li>Sharer Number: {sharer_num}</li>
+                <li>Total Passengers: {passenger_num}</li>
+                <li>Vehicle Type: {car_type}</li>
+                <li>Special Info: {special_info}</li>
+                <button @click="cancel">Cancel Order</button>
+                <button @click="edit">Edit Request</button>
+            </div>
+          
+            
+        </div>
+        
+        
+    </div>
+    <script>
+        var app = new Vue({
+            el:"#app",
+            delimiters: ['{', '}'],
+            data:{
+                destination: '',
+                arrival_time: '',
+                passenger_num: 0,
+                is_exclusive: "No",
+                car_type:'Unspecified',
+                special_info: '',
+                order_id: '',
+                sharer_num: 0,
+                status: "",
+            },
+            mounted: function() {
+                that = this
+                axios.get("aux_get_order_info__view").then(function(response) {
+                        if (response.data.status_code == 1) {
+                            alert("Please log in first!")
+                        } else {
+                            that.order_id = response.data[0].pk
+                            console.log(response.data[0].fields)
+                            that.status = "Open"
+                            that.destination = response.data[0].fields.destination
+                            that.arrival_time = response.data[0].fields.arrival_time
+                            that.passenger_num = response.data[0].fields.passenger_num
+                            that.is_exclusive = response.data[0].fields.is_exclusive ? "Yes" : "No"
+                            that.car_type = response.data[0].fields.car_type
+                            that.special_info = response.data[0].fields.special_info
+                            that.sharer_num = response.data[0].fields.sharer_num
+                        }
+                    }).catch(function(err) {
+                        alert('Error');
+                    });
+            },
+            methods: {
+                edit: function() {
+                    that = this;
+                    axios.get("edit/"+that.order_id).then(function(response) {
+                        if (response.data.status_code == 1) {
+                            alert("Please log in first!")
+                        } else {
+                            location.href = "/edit_order.html"
+                        }
+                    }).catch(function(err) {
+                        alert('Error');
+                    });
+                },
+                cancel: function() {
+                    that = this;
+                    axios.get("cancel/"+that.order_id).then(function(response) {
+                        if (response.data.status_code == 1) {
+                            alert("Please log in first!")
+                            location.href = "/login.html"
+                        } else if (response.data.status_code == 3) {
+                            alert("Order has been confirmed already, you can't cancel it now!")
+                            location.href = "/orders.html"
+                        } else if (response.data.status_code == 4) {
+                            alert("Order has been cancelled by the owner, we're sorry!")
+                            location.href = "/orders.html"
+                        } else {
+                            alert("Cancelled successfully!")
+                            location.href = "/orders.html"
+                        }
+                    }).catch(function(err) {
+                        alert('Error');
+                    });
+                }
+            },
+            
+
+        });
+    </script>
+    
+</body>
+</html>

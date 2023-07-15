@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to Amazon!</title>
+    <link rel="stylesheet" href="static/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+
+</head>
+    
+<body>
+    <div id="index_body_banner">
+        <div id="index_body_banner_logo" onclick="location.href='index.html'">
+            Amazon
+        </div>
+        <span>together, make the world a better place</span>
+        <div id="index_body_banner_login">
+            <button id="login_button" onclick="location.href='login.html'">Log in</button>>
+            <button id="signup_button" onclick="location.href='signup.html'">Sign up</button>
+        </div>
+    </div>
+    <div id="signup_body_main">
+        <div id="signup_box_logo">
+            Amazon
+        </div>
+        <div id="signup_box">
+            <li>Username: &nbsp;<input type="text" v-model="username"/></li>
+            <li>Password: &nbsp;<input type="password" v-model="password"/></li>
+            <li>&nbsp;&nbsp;&nbsp;E-mail:   &nbsp;<input type="text" v-model="email"/> </li>
+        </div>
+        <div id="signup_logo" @click='signup'>
+            Sign Up
+        </div>
+
+    </div>
+    
+    <script>
+        var app = new Vue({
+            el:"#signup_body_main",
+            data:{
+                username:'',
+                password:'',
+                email:'',
+            },
+            methods: {
+                signup: function() {
+                    that = this;
+                    if (that.username == '') {
+                        alert('Username cannot be empty!')
+                        return
+                    }
+                    if (that.password == '') {
+                        alert("Password cannot be empty!")
+                        return
+                    }
+                    if (that.email == '') {
+                        alert("E-mail cannot be empty!")
+                        return
+                    }
+                    if (that.email.match("[a-zA-Z0-9]+@[a-zA-Z0-9]+(.[a-zA-Z0-9]+)+") == null) {
+                        alert("Invalid Email address!")
+                        return
+                    }
+                    axios.get("signup/"+that.username+"/"+that.password+"/"+that.email).then(function(response) {
+                        if (response.data.errorMsg != null) {
+                            alert(response.data.errorMsg)
+                        } else {
+                            alert("Signup done, please log in now!")
+                            location.href = 'login.html'
+                        }
+                    }).catch(function(err) {
+                        alert('Error');
+                    });
+                },
+                
+            }
+
+        });
+        
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="static/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <title></title>
+</head>
+<body>
+    <div id="secret_signup">
+        <div class="login_as" id = "signup_as_driver" onclick="location.href='/request_ride.html'">
+            <div>
+                <div id="login_as_text" >Request to Ride</div>
+            </div>
+            <div id="mini_arrow"></div>
+        </div>
+        <div class="login_as" onclick="location.href='/share_search.html'">
+            <div>
+                <div id="login_as_text">Request to Share</div>
+            </div>
+            <div id="mini_arrow"></div>
+        </div>
+        <div id="drive"class="login_as" @click="drive" >
+            <div>
+                <div id="login_as_text">Request to Drive</div>
+            </div>
+            <div id="mini_arrow"></div>
+        </div>
+    </div>
+    <script>
+        var app = new Vue({
+            el:"#drive",
+            data:{
+        
+            },
+            methods: {
+                drive: function() {
+                    that = this;
+
+                    axios.get("/aux_get_user_info").then(function(response) {
+                        if (response.data[0].fields.is_driver == true) {
+                            location.href = '/drive_search.html'
+                        } else {
+                            location.href = '/not_a_driver.html'
+                        }
+                    }).catch(function(err) {
+                        alert('Error');
+                    });
+                }
+            },
+            
+
+        });
+    </script>
+    
+</body>
+</html>

@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to Amazon!</title>
+    <link rel="stylesheet" href="static/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <style>
+        h1 {
+            margin-top: 20px;
+            margin-left: 30px;
+
+        }
+        input {
+            margin-top: 30px;
+            width: 510px;
+            height: 30px;
+            padding-left: 12px;
+        
+        }
+
+        #drive_search {
+            margin-left: 200px;
+            height: 100px;
+            width: 800px;
+            border-bottom: 1px solid gray;
+            font-size: 21px;
+            padding-bottom: 40px;
+        }
+        button {
+            background-color: black;
+            color: white;
+            font-size: 20px;
+            margin-top: 30px;
+         
+            width: 180px;
+            height: 48px;
+            margin-left: 50px;
+        }
+        
+        #result {
+            margin-top: 50px;
+            background-color: white;
+            padding-bottom: 40px;
+        }
+        #result>ul {
+            font-size: 20px;
+            list-style: none;
+            width: 900px;
+            border: 1px solid gray;
+            margin-left: -50px;
+            border-radius: 10px;
+            margin-top: 20px;
+            text-align: left;
+            height: 50px;
+            padding-left: 20px;
+            padding-top: 30px;
+        }
+        ul>li {
+            display: inline;
+            margin-left: 22px;
+        }
+        #confirm_ {
+            float: right;
+            font-size: 19px;
+            width: 120px;
+            height: 45px;
+            margin-top: -36px;
+            margin-right: 20px;
+            background-color: black;
+            color: white;   
+        }
+
+        #confirm_:hover {
+        background-color: white;
+        color: black;
+        cursor: pointer;
+    }
+
+        p {
+            padding-left: -10px;
+            padding-top: 14px;
+        }
+    </style>
+</head>
+    
+<body>
+    
+    <div id="drive_search">
+        &nbsp;<input type="text" v-model="name" placeholder = "Search for Anything" required maxlength="50" @keyup.enter="search">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    <button @click="search">Search</button><br>
+    <p>You found {items.length} items.</p>
+    <div id="result">
+        <ul v-for='(item, i) in items'>
+            <li>Name: {item.name}</li>&nbsp;&nbsp;&nbsp; <b>|</b>
+            <li>Desc.: {item.description}</li>&nbsp;
+            <br>
+            <button id="confirm_" @click="buy(item.product_id)">Buy</button>
+        </ul>
+    </div>
+    </div>
+    <script>
+        var app = new Vue({
+            el:"#drive_search",
+            delimiters: ['{', '}'],
+            data:{
+                name: '',
+                items: [],
+            },
+            mounted: function() {
+                that = this;
+                axios.get("/catalog").then(function(response) {
+                    if (response.data.errorMsg != null) {
+                        alert(response.data.errorMsg)
+                        location.href = 'login.html'
+                    } else {
+                        that.items = []
+                        for (i = 0; i < response.data.length; ++i) {
+                            response.data[i].fields["product_id"] = response.data[i].pk
+                            that.items.push(response.data[i].fields)
+                        }
+                    }
+                }).catch(function(err) {
+                    alert('Error');
+                });
+            },
+            methods: {
+                search: function() {
+                    that = this;
+                    if (that.name == '') {
+                        alert("Search input cannot be empty!")
+                        return
+                    }
+
+                    axios.get("search/"+that.name).then(function(response) {
+                        if (response.data.errorMsg != null) {
+                            alert("Please log in first!");
+                            location.href = "login.html"
+                        } else {
+                            that.items = []
+                            for (i = 0; i < response.data.length; ++i) {
+                                response.data[i].fields["product_id"] = response.data[i].pk
+                                that.items.push(response.data[i].fields)                   
+                            }
+                            
+                        }
+                    }).catch(function(err) {
+                        alert('Error');
+                    });
+                }
+                ,
+            buy: function(oid) {
+                that = this;
+                // location.href = "buy.html"
+                axios.get("buy/"+oid).then(function(response) {
+                    if (response.data.status_code == 1) {
+                        alert("Please log in first!");
+                        location.href = "login.html"
+                    } else if (response.data.status_code == 2) {
+                        alert("Item does not exist!")
+                        return
+                    } else {
+                        location.href = "confirm.html"
+                    }
+                }).catch(function(err) {
+                    alert('Error');
+                });
+            }
+            
+        }
+        });
+    </script>
+    
+    
+    
+
+
+</body>
+</html>

@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to WeRide!</title>
+    <link rel="stylesheet" href="static/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+
+</head>
+    
+<body>
+    <div id="index_body_banner">
+        <div id="index_body_banner_logo">
+            WeRide
+        </div>
+        <span>together, make the world a better place</span>
+        <div id="index_body_banner_login">
+            <button id="login_button">Login in</button>>
+            <button id="signup_button">Sign up</button>
+        </div>
+    </div>
+    <div id="index_body_main">
+        <div id="index_body_main_news">
+            <span>Get in the driver’s seat and get paid!</span>
+            <span>Drive on the platform with the largest network of active riders!</span>
+          
+        </div>
+    </div>
+    <div id="secret_login">
+        <div class="login_as" id = "login_as_driver" onclick="location.href='login_driver.html'">
+            <div>
+                <div id="login_as_text">Login to drive</div>
+            </div>
+            <div id="mini_arrow"></div>
+        </div>
+        <div class="login_as" id = "login_as_rider" onclick="location.href='login_rider.html'">
+            <div>
+                <div id="login_as_text">Log in to ride</div>
+            </div>
+            <div id="mini_arrow"></div>
+        </div>
+    </div>
+    <div id="secret_signup">
+        <div class="login_as" id = "signup_as_driver" onclick="location.href='signup_driver.html'">
+            <div>
+                <div id="login_as_text">Sign up to drive</div>
+            </div>
+            <div id="mini_arrow"></div>
+        </div>
+        <div class="login_as" onclick="location.href='signup_rider.html'">
+            <div>
+                <div id="login_as_text">Sign up to ride</div>
+            </div>
+            <div id="mini_arrow"></div>
+        </div>
+    </div>
+    <script>
+        var login_button = document.getElementById("login_button")
+        var signup_button = document.getElementById("signup_button")
+        var main_page_button = document.getElementById("index_body_banner_logo")
+        var index_body_main = document.getElementById("index_body_main")
+        var secret_login = document.getElementById("secret_login")
+        var secret_signup = document.getElementById("secret_signup")
+        var login_as_driver = document.getElementById("login_as_driver");
+        
+        login_button.onclick = function() {
+            index_body_main.style.display = "none"
+            secret_signup.style.display = "none"
+            secret_login.style.display = "block"
+        }
+        signup_button.onclick = function() {
+            index_body_main.style.display = "none"
+            secret_signup.style.display = "block"
+            secret_login.style.display = "none"
+        }
+
+        main_page_button.onclick = function() {
+            index_body_main.style.display = "block"
+            secret_signup.style.display = "none"
+            secret_login.style.display = "none"
+        }
+    </script>
+
+</body>
+</html>

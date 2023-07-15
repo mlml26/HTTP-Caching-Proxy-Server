@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="static/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+    <!-- <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script> -->
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <title></title>
+    <style>
+        h2 {
+            text-align: center;
+            margin-top: 40px;
+            font-size: 50px;
+            
+        }
+        #request {
+            margin-top: 30px;
+            margin-left: 240px;
+            width: 60%;
+            text-align: center;
+            padding: auto auto;
+            font-size: 25px;
+            border: 1px solid black;
+            padding-bottom: 40px;
+
+        }
+        input {
+            margin-top: 30px;
+            width: 220px;
+            height: 25px;
+        }
+        select {
+            margin-top: 30px;
+            width: 110px;
+            height: 22px;
+            margin-bottom: 0px;
+            text-align: center;
+        }
+        button {
+            background-color: black;
+            color: white;
+            font-size: 20px;
+            margin-top: 40px;
+         
+            width: 220px;
+            height: 80px;
+        }
+        
+        textarea {
+            font-style: normal;
+            width: 200px;
+            height: 60px;
+            margin-top: 20px;
+            vertical-align: middle;
+  
+        }
+
+        #num {
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div id="secret_signup">
+        <div id="app">
+            <h2>Ride Information</h2>
+            <div id="request">
+                Destination: &nbsp;<input type="text" v-model="destination" required maxlength="50"><br>
+                Arrival Time: &nbsp;<input type="datetime-local" v-model= "arrival_time" required><br>
+                Passenger Number: &nbsp;<input type="number" v-model="passenger_num"required max="500" id="num"><br>
+                Do you want a shared ride? &nbsp;
+                <select v-model="is_exclusive" required>
+                    <option value="No">No</option>
+                    <option value="Yes">Yes</option>
+                </select><br>
+                Do you have any requirement on vehicle type? &nbsp;<select type="text" v-model="car_type" required>
+                    <option selected value="Unspecified">Unspecified</option>
+                    <option value="Sedan">Sedan</option>
+                    <option value="SUV">SUV</option>
+                    <option value="Sports Car">Sports Car</option>
+                    <option value="Convertible">Convertible</option>
+                    <option value="Truck">Truck</option>
+                    <option value="Minivan">Minivan</option>
+                </select><br>
+                Special Info: &nbsp;<textarea v-model="special_info"></textarea><br>
+                <button @click="request">Request a Ride Now</button>
+            </div>
+          
+            
+        </div>
+        
+        
+    </div>
+    <script>
+        var app = new Vue({
+            el:"#app",
+            data:{
+                destination: '',
+                arrival_time: '',
+                passenger_num: 0,
+                is_exclusive: "No",
+                car_type:'Unspecified',
+                special_info: '',
+            },
+            methods: {
+                request: function() {
+                    that = this;
+                    if (that.destination == '') {
+                        alert('Destination cannot be empty!')
+                        return
+                    }
+                    if (that.arrival_time == '') {
+                        alert("Arrival time cannot be empty!")
+                        return
+                    }
+                    if (that.passenger_num <= 0 || that.passenger_num > 500) {
+                        alert("Please enter a valid passenger number!")
+                        return
+                    }
+                    axios.get("/request/"+that.destination+"/"+that.arrival_time+"/"+that.passenger_num+"/"+that.is_exclusive+"/"+that.car_type+"/"+that.special_info).then(function(response) {
+                        if (response.data.status_code != 0) {
+                            alert("Please log in first!")
+                        } else {
+                            alert("Order has been published!")
+                            location.href = "/orders.html"
+                        }
+                    }).catch(function(err) {
+                        alert('Error');
+                    });
+                }
+            },
+            
+
+        });
+    </script>
+    
+</body>
+</html>

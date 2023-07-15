@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to WeRide!</title>
+    <link rel="stylesheet" href="static/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <style>
+        h1 {
+            margin-top: 20px;
+            margin-left: 15px;
+
+        }
+        input {
+            margin-top: 30px;
+            width: 150px;
+            height: 25px;
+        }
+
+        #share_search {
+            margin-left: 50px;
+            height: 200px;
+            width: 980px;
+            font-size: 21px;
+            padding-bottom: 40px;
+        }
+        button {
+            
+            background-color: black;
+            color: white;
+            font-size: 18px;
+         
+            width: 230px;
+            height: 40px;
+            margin-left: 70px;
+        }
+        
+        #result {
+            margin-top: 50px;
+            height: 500px;
+        }
+        #info {
+            width: 900px;
+            margin-left: 100px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid gray;
+        }
+        li {
+            margin-top: 20px;
+            margin-left: 50px;
+            display: inline;
+            list-style: none;
+        }
+        .date_input {
+            width: 230px;
+        }
+        .num_input {
+            width: 80px;
+        }
+        #special_info {
+            width: 400px;
+        }
+        button:hover {
+            cursor: pointer;
+        }
+        #result {
+            margin-top: 20px;
+            margin-left: 100px;
+            background-color: white;
+            padding-bottom: 40px;
+        }
+        ul {
+            padding-top: 20px;
+            padding-left: -10px;
+            font-size: 20px;
+            list-style: none;
+            width: 850px;
+            border: 2px solid gray;
+            margin-left: 25px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+        #join_ {
+            font-size: 20px;
+            width: 200px;
+            height: 50px;
+            width: 96%;
+            margin-left: 15px;
+            padding: auto;
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+    
+<body>
+    
+    <div id="share_search">
+        <div id="info"> 
+        <li>Destination: &nbsp;<input type="text" v-model="destination" required maxlength="50">&nbsp;&nbsp;&nbsp;&nbsp;
+        Earliest Arrival: &nbsp;<input type="datetime-local" v-model="earliest_time" class="date_input"required></li>
+        <br>   
+        <li>Latest Arrival: &nbsp;<input type="datetime-local" v-model="latest_time" class="date_input" required>
+        <button @click="search">Find Shared Rides</button></li>
+        </div>
+  
+        <div id="result">
+            You found {orders.length} orders.<br>
+            <ul v-for='item in orders'>
+                <li>Order ID: {item.id}</li>
+                <li>Destination: {item.destination}</li>
+                <li>Passenger Number: {item.passenger_num}</li>
+                <li>Vehicle Type: {item.car_type}</li><br>
+                <li>Arrival Time: {item.arrival_time}</li>
+                
+                
+                <li>Special info: {item.special_info}</li><br>
+                <button id="join_" @click="join(item.id)">Join</button>
+            </ul>
+        </div>
+    </div>
+    <script>
+        var app = new Vue({
+            el:"#share_search",
+            delimiters: ['{', '}'],
+            data:{
+                destination: '',
+                earliest_time: '',
+                latest_time: '',
+                passenger_num: 1,
+                car_type: 'Unspecified',
+                special_info: '',
+                orders: [],
+            },
+            methods: {
+                search: function() {
+                    that = this;
+                    if (that.destination == '') {
+                        alert('Destination cannot be empty!')
+                        return
+                    }
+                    if (that.earliest_time == '' || that.latest_time == '') {
+                        alert("Arrival time cannot be empty!")
+                        return
+                    }
+                    if (that.passenger_num <= 0 || that.passenger_num > 500) {
+                        alert("Please enter a valid passenger number!")
+                        return
+                    }
+                    axios.get("/share_search/"+that.destination+"/"+that.earliest_time+"/"+that.latest_time+"/"+that.passenger_num+"/"+that.car_type+"/"+that.special_info).then(function(response) {
+                        if (response.data.status_code == 1) {
+                            alert("Please log in first!")
+                            return
+                        } else {
+                            that.orders = []
+                            for (i = 0; i < response.data.length; ++i) {
+                                response.data[i].fields["id"] = response.data[i].pk
+                                that.orders.push(response.data[i].fields)                   
+                            }
+
+                        }
+                    }).catch(function(err) {
+                        alert('Error');
+                    });
+                }
+                ,
+            join: function(oid) {
+                that = this;
+                var x = prompt("Your passenger number would be", "0")
+                if (x == null) {
+                    return
+                }
+                x = parseInt(x)
+                
+                axios.get("join/"+oid+"/"+x).then(function(response) {
+                    if (response.data.status_code == 1) {
+                        alert("Please log in first!");
+                        location.href = "login.html"
+                    } else if (response.data.status_code == 3){
+                        alert("This order has been completed, invalid join!")
+                        return; 
+                    } else {
+                        alert("Joined!")
+                        location.href = "orders.html"
+                        
+                    }
+                }).catch(function(err) {
+                    alert('Error');
+                });
+            }
+            
+        }
+        });
+    </script>
+    
+    
+    
+
+
+</body>
+</html>
